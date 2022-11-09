@@ -1,0 +1,118 @@
+---
+title: "Data 605 - Discussion Board12"
+author: "IvanTikhonov"
+date: "2022-11-09"
+output: html_document
+---
+Multiple Regression
+
+Real estate price prediction:Regression analysis, linear regression, multiple regression,
+and prediction models were all used to build this real estate dataset.
+It covers the purchase date, the age of the house, the location,
+the distance to the closest MRT station, and the housing price per square foot.
+
+Data set was acquired using https://www.kaggle.com/datasets/quantbruce/real-estate-price-prediction
+
+```{r}
+# Load Libraries
+library(tidyverse)
+```
+
+```{r}
+# Import data
+real_estate <- read.csv("https://raw.githubusercontent.com/IvanGrozny88/DATA605Assignment_12/main/Real%20estate.csv")
+head(real_estate, n = 5)
+```
+This dataset has no missing values.
+
+```{r}
+# Checking is missing values
+head(is.na(real_estate))
+```
+There are 414 rows and 8 columns in this data set.
+
+```{r}
+# Summary of data set
+summary(real_estate)
+```
+```{r}
+# Getting colnames 
+colnames(real_estate)
+```
+```{r}
+# Renaming for easier read
+colnames(real_estate) <- c("No", "Transaction_Date", "House_Age", 
+                           "Nearest_MRT_Station", "Number_Convenience_Stores",
+                           "Latitude", "Longitude", "House_Price")
+head(real_estate)
+```
+
+Regression Analysis
+I started by running a simple linear model using the variables house price and house age.
+The multiple R2 is 0.4434, which according to the summary explains 44.34% of the data model's variance,
+and has a p-value of 1.56e-05, which is less than 0.05.
+
+```{r}
+# Obtaining our singular Linear Model
+my_lm <- lm(House_Price ~ House_Age, real_estate)
+summary(my_lm)
+```
+Managing various regressions To see how the two models would differ from one another,
+I developed a second model and this time added extra coefficients.
+There are already some variations between the multiple, coefficients, and residuals.
+The current R2 is 58.24%, and the p-value is 2.2e-16.
+
+```{r}
+# Running the multiple regression
+my_lm2 <- lm(House_Price ~ Transaction_Date + House_Age +  
+                           Nearest_MRT_Station + Number_Convenience_Stores +
+                           Latitude + Longitude, real_estate)
+summary(my_lm2)
+```
+Since Longitude has a p-value above 0.05, as can be seen,
+I will eliminate it to create a third regression model.
+The coefficient values below show some tiny variations,
+but they are all less than 0.05.
+
+```{r}
+# Multiple regression without Longitude
+my_lm3 <- lm(House_Price ~ Transaction_Date + House_Age +  Nearest_MRT_Station + 
+               Number_Convenience_Stores + Latitude, real_estate)
+summary(my_lm3)
+```
+Residual Analysis
+
+```{r}
+# my_lm
+par(mfrow = c(2,2))
+plot(my_lm)
+```
+```{r}
+# my_lm2
+par(mfrow = c(2,2))
+plot(my_lm2)
+```
+
+```{r}
+# my_lm3
+par(mfrow = c(2,2))
+plot(my_lm3)
+```
+```{r}
+# my_lm
+hist(my_lm$residuals, xlab = 'Residuals', main = 'Histogram of Singluar Linear Model')
+```
+```{r}
+#my_lm2
+hist(my_lm2$residuals, xlab = 'Residuals', main = 'Histogram of Multiple Linear Model')
+```
+```{r}
+#my_lm3
+hist(my_lm3$residuals, xlab = 'Residuals', main = 'Histogram of Multiple Linear Model without Longitude')
+```
+Conclusion:
+This model does fit the data because residuals are regularly distributed,
+particularly for the second and third models that were developed.
+
+
+
